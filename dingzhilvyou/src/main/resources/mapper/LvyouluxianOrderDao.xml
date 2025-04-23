@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LvyouluxianOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.lvyouluxian_order_uuid_number as lvyouluxianOrderUuidNumber
+        ,a.lvyouluxian_id as lvyouluxianId
+        ,a.yonghu_id as yonghuId
+        ,a.buy_number as buyNumber
+        ,a.lvyouluxian_order_true_price as lvyouluxianOrderTruePrice
+        ,a.lvyouluxian_order_types as lvyouluxianOrderTypes
+        ,a.lvyouluxian_order_payment_types as lvyouluxianOrderPaymentTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LvyouluxianOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,lvyouluxian.lvyouluxian_name as lvyouluxianName
+        ,lvyouluxian.lvyouluxian_photo as lvyouluxianPhoto
+        ,lvyouluxian.lvyouluxian_shijian as lvyouluxianShijian
+        ,lvyouluxian.lvyouluxian_xingcheng as lvyouluxianXingcheng
+        ,lvyouluxian.lvyouluxian_types as lvyouluxianTypes
+        ,lvyouluxian.lvyouluxian_kucun_number as lvyouluxianKucunNumber
+        ,lvyouluxian.lvyouluxian_old_money as lvyouluxianOldMoney
+        ,lvyouluxian.lvyouluxian_new_money as lvyouluxianNewMoney
+        ,lvyouluxian.lvyouluxian_clicknum as lvyouluxianClicknum
+        ,lvyouluxian.shangxia_types as shangxiaTypes
+        ,lvyouluxian.lvyouluxian_delete as lvyouluxianDelete
+        ,lvyouluxian.lvyouluxian_content as lvyouluxianContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+
+        FROM lvyouluxian_order  a
+        left JOIN lvyouluxian lvyouluxian ON a.lvyouluxian_id = lvyouluxian.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.lvyouluxianOrderUuidNumber != '' and params.lvyouluxianOrderUuidNumber != null and params.lvyouluxianOrderUuidNumber != 'null' ">
+                and a.lvyouluxian_order_uuid_number like CONCAT('%',#{params.lvyouluxianOrderUuidNumber},'%')
+            </if>
+            <if test="params.lvyouluxianId != null and params.lvyouluxianId != ''">
+                and (
+                    a.lvyouluxian_id = #{params.lvyouluxianId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.buyNumberStart != null and params.buyNumberStart != ''">
+                <![CDATA[  and a.buy_number >= #{params.buyNumberStart}   ]]>
+            </if>
+            <if test="params.buyNumberEnd != null and params.buyNumberEnd != ''">
+                <![CDATA[  and a.buy_number <= #{params.buyNumberEnd}   ]]>
+            </if>
+             <if test="params.buyNumber != null and params.buyNumber != ''">
+                and a.buy_number = #{params.buyNumber}
+             </if>
+            <if test="params.lvyouluxianOrderTruePriceStart != null ">
+                <![CDATA[  and a.lvyouluxian_order_true_price >= #{params.lvyouluxianOrderTruePriceStart}   ]]>
+            </if>
+            <if test="params.lvyouluxianOrderTruePriceEnd != null ">
+                <![CDATA[  and a.lvyouluxian_order_true_price <= #{params.lvyouluxianOrderTruePriceEnd}   ]]>
+            </if>
+            <if test="params.lvyouluxianOrderTypes != null and params.lvyouluxianOrderTypes != ''">
+                and a.lvyouluxian_order_types = #{params.lvyouluxianOrderTypes}
+            </if>
+            <if test="params.lvyouluxianOrderPaymentTypes != null and params.lvyouluxianOrderPaymentTypes != ''">
+                and a.lvyouluxian_order_payment_types = #{params.lvyouluxianOrderPaymentTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断旅游路线的id不为空 -->
+            <if test=" params.lvyouluxianIdNotNull != '' and params.lvyouluxianIdNotNull != null and params.lvyouluxianIdNotNull != 'null' ">
+                and a.lvyouluxian_id IS NOT NULL
+            </if>
+            <if test=" params.lvyouluxianName != '' and params.lvyouluxianName != null and params.lvyouluxianName != 'null' ">
+                and lvyouluxian.lvyouluxian_name like CONCAT('%',#{params.lvyouluxianName},'%')
+            </if>
+            <if test=" params.lvyouluxianShijian != '' and params.lvyouluxianShijian != null and params.lvyouluxianShijian != 'null' ">
+                and lvyouluxian.lvyouluxian_shijian like CONCAT('%',#{params.lvyouluxianShijian},'%')
+            </if>
+            <if test=" params.lvyouluxianXingcheng != '' and params.lvyouluxianXingcheng != null and params.lvyouluxianXingcheng != 'null' ">
+                and lvyouluxian.lvyouluxian_xingcheng like CONCAT('%',#{params.lvyouluxianXingcheng},'%')
+            </if>
+            <if test="params.lvyouluxianTypes != null  and params.lvyouluxianTypes != ''">
+                and lvyouluxian.lvyouluxian_types = #{params.lvyouluxianTypes}
+            </if>
+
+            <if test="params.lvyouluxianKucunNumberStart != null  and params.lvyouluxianKucunNumberStart != '' ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_kucun_number >= #{params.lvyouluxianKucunNumberStart}   ]]>
+            </if>
+            <if test="params.lvyouluxianKucunNumberEnd != null  and params.lvyouluxianKucunNumberEnd != '' ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_kucun_number <= #{params.lvyouluxianKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.lvyouluxianKucunNumber != null  and params.lvyouluxianKucunNumber != '' ">
+                and lvyouluxian.lvyouluxian_kucun_number = #{params.lvyouluxianKucunNumber}
+            </if>
+            <if test="params.lvyouluxianOldMoneyStart != null ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_old_money >= #{params.lvyouluxianOldMoneyStart}   ]]>
+            </if>
+            <if test="params.lvyouluxianOldMoneyEnd != null ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_old_money <= #{params.lvyouluxianOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.lvyouluxianNewMoneyStart != null ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_new_money >= #{params.lvyouluxianNewMoneyStart}   ]]>
+            </if>
+            <if test="params.lvyouluxianNewMoneyEnd != null ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_new_money <= #{params.lvyouluxianNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.lvyouluxianClicknumStart != null  and params.lvyouluxianClicknumStart != '' ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_clicknum >= #{params.lvyouluxianClicknumStart}   ]]>
+            </if>
+            <if test="params.lvyouluxianClicknumEnd != null  and params.lvyouluxianClicknumEnd != '' ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_clicknum <= #{params.lvyouluxianClicknumEnd}   ]]>
+            </if>
+            <if test="params.lvyouluxianClicknum != null  and params.lvyouluxianClicknum != '' ">
+                and lvyouluxian.lvyouluxian_clicknum = #{params.lvyouluxianClicknum}
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and lvyouluxian.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.lvyouluxianDeleteStart != null  and params.lvyouluxianDeleteStart != '' ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_delete >= #{params.lvyouluxianDeleteStart}   ]]>
+            </if>
+            <if test="params.lvyouluxianDeleteEnd != null  and params.lvyouluxianDeleteEnd != '' ">
+                <![CDATA[  and lvyouluxian.lvyouluxian_delete <= #{params.lvyouluxianDeleteEnd}   ]]>
+            </if>
+            <if test="params.lvyouluxianDelete != null  and params.lvyouluxianDelete != '' ">
+                and lvyouluxian.lvyouluxian_delete = #{params.lvyouluxianDelete}
+            </if>
+            <if test=" params.lvyouluxianContent != '' and params.lvyouluxianContent != null and params.lvyouluxianContent != 'null' ">
+                and lvyouluxian.lvyouluxian_content like CONCAT('%',#{params.lvyouluxianContent},'%')
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
